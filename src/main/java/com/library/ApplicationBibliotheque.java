@@ -2,6 +2,7 @@ package com.library;
 
 import com.library.model.Livre;
 import com.library.model.Utilisateur;
+import com.library.model.Emprunt;
 import com.library.service.ServiceBibliotheque;
 import com.library.utils.GenerateurId;
 
@@ -22,51 +23,54 @@ public class ApplicationBibliotheque {
 
         while (true) {
             afficherMenu();
-            int choix = scanner.nextInt();
-            scanner.nextLine(); // Consommer la nouvelle ligne
+            String choix = scanner.nextLine();
 
             switch (choix) {
-                case 1:
+                case "1":
                     ajouterLivre();
                     break;
-                case 2:
+                case "2":
                     rechercherLivres();
                     break;
-                case 3:
+                case "3":
                     emprunterLivre();
                     break;
-                case 4:
+                case "4":
                     rendreLivre();
                     break;
-                case 5:
+                case "5":
                     afficherStatistiques();
                     break;
-                case 6:
+                case "6":
                     supprimerLivre();
                     break;
-                case 7:
+                case "7":
                     ajouterUtilisateur();
                     break;
-                case 8:
+                case "8":
                     noterLivre();
                     break;
-                case 9:
+                case "9":
                     listerUtilisateurs();
                     break;
-                case 10:
+                case "10":
                     listerLivres();
                     break;
-                case 0:
-                    System.out.println("Au revoir!");
-                    return;
+                case "11":
+                    afficherHistoriqueEmprunts();
+                    break;
+                case "0":
+                    System.out.println("Au revoir !");
+                    scanner.close();
+                    System.exit(0);
                 default:
-                    System.out.println("Option invalide. Veuillez réessayer s'il vous plaît.");
+                    System.out.println("Option invalide !");
             }
         }
     }
 
     private static void afficherMenu() {
-        System.out.println("\n=== Bibliothèque Virtuelle ===");
+        System.out.println("\n=== Menu Principal ===");
         System.out.println("1. Ajouter un livre");
         System.out.println("2. Rechercher des livres");
         System.out.println("3. Emprunter un livre");
@@ -77,22 +81,23 @@ public class ApplicationBibliotheque {
         System.out.println("8. Noter un livre");
         System.out.println("9. Lister les utilisateurs");
         System.out.println("10. Lister tous les livres");
+        System.out.println("11. Afficher l'historique des emprunts");
         System.out.println("0. Quitter");
-        System.out.print("Votre choix : ");
+        System.out.print("Choix : ");
     }
 
     private static void ajouterLivre() {
         System.out.println("\n=== Ajouter un livre ===");
-        
+
         System.out.print("Titre : ");
         String titre = scanner.nextLine();
         System.out.print("Auteur : ");
         String auteur = scanner.nextLine();
-        
+
         int anneePublication = 0;
         boolean anneeValide = false;
         int anneeActuelle = Year.now().getValue();
-        
+
         while (!anneeValide) {
             System.out.print("Année de publication : ");
             try {
@@ -106,7 +111,7 @@ public class ApplicationBibliotheque {
                 System.out.println("Veuillez entrer une année valide.");
             }
         }
-        
+
         System.out.print("Genre : ");
         String genre = scanner.nextLine();
 
@@ -120,13 +125,13 @@ public class ApplicationBibliotheque {
         System.out.println("2. Par auteur");
         System.out.println("3. Par genre");
         System.out.print("Votre choix : ");
-        
+
         int choix = scanner.nextInt();
         scanner.nextLine(); // Consommer la nouvelle ligne
-        
+
         System.out.print("Entrez votre recherche : ");
         String recherche = scanner.nextLine();
-        
+
         List<Livre> resultats = null;
         switch (choix) {
             case 1:
@@ -142,7 +147,7 @@ public class ApplicationBibliotheque {
                 System.out.println("Option invalide.");
                 return;
         }
-        
+
         if (resultats.isEmpty()) {
             System.out.println("Aucun livre trouvé.");
         } else {
@@ -152,62 +157,66 @@ public class ApplicationBibliotheque {
 
     private static void emprunterLivre() {
         System.out.println("\n=== Emprunter un livre ===");
-        
+
         // Vérifier s'il y a des utilisateurs
         if (serviceBibliotheque.nombreUtilisateurs() == 0) {
             System.out.println("\nAucun utilisateur enregistré. Veuillez d'abord ajouter un utilisateur.");
             return;
         }
-        
+
         // Vérifier s'il y a des livres disponibles
         List<Livre> livresDisponibles = serviceBibliotheque.getLivresDisponibles();
         if (livresDisponibles.isEmpty()) {
             System.out.println("\nAucun livre disponible pour l'emprunt.");
             return;
         }
-        
+
         // Afficher la liste des utilisateurs
         System.out.println("\nListe des utilisateurs :");
         serviceBibliotheque.listerUtilisateurs();
-        
+
         // Afficher la liste des livres disponibles
         System.out.println("\nLivres disponibles :");
         livresDisponibles.forEach(System.out::println);
-        
+
         System.out.print("\nID de l'utilisateur (ex: U001) : ");
         String idUtilisateur = scanner.nextLine();
         System.out.print("ID du livre (ex: L001) : ");
         String idLivre = scanner.nextLine();
 
-        if (serviceBibliotheque.emprunterLivre(idUtilisateur, idLivre)) {
-            System.out.println("Livre emprunté avec succès!");
+        Emprunt emprunt = serviceBibliotheque.emprunterLivre(idLivre, idUtilisateur);
+        if (emprunt != null) {
+            System.out.println("Livre emprunté avec succès! ID de l'emprunt : " + emprunt.getId());
         } else {
             System.out.println("Impossible d'emprunter le livre. Vérifiez les IDs et la disponibilité du livre.");
         }
     }
 
     private static void rendreLivre() {
-        System.out.println("\n=== Retourner un livre ===");
-        
-        // Vérifier s'il y a des emprunts en cours
-        if (!serviceBibliotheque.existeEmpruntsEnCours()) {
+        System.out.println("\n=== Retour d'un livre ===");
+
+        // Afficher la liste des emprunts en cours
+        List<Emprunt> empruntsEnCours = serviceBibliotheque.getEmpruntsEnCours();
+        if (empruntsEnCours.isEmpty()) {
             System.out.println("\nAucun emprunt en cours.");
             return;
         }
-        
-        // Afficher la liste des utilisateurs et leurs livres empruntés
-        System.out.println("\nLivres actuellement empruntés :");
-        serviceBibliotheque.listerEmpruntsEnCours();
-        
-        System.out.print("\nID de l'utilisateur (ex: U001) : ");
-        String idUtilisateur = scanner.nextLine();
-        System.out.print("ID du livre (ex: L001) : ");
-        String idLivre = scanner.nextLine();
 
-        if (serviceBibliotheque.rendreLivre(idUtilisateur, idLivre)) {
+        System.out.println("\nEmprunts en cours :");
+        for (Emprunt emprunt : empruntsEnCours) {
+            System.out.println("ID Emprunt: " + emprunt.getId() +
+                    " | Livre: " + emprunt.getLivre().getTitre() +
+                    " | Emprunteur: " + emprunt.getUtilisateur().getNom() +
+                    " | Date d'emprunt: " + emprunt.getDateEmprunt());
+        }
+
+        System.out.print("\nID de l'emprunt (ex: E001) : ");
+        String idEmprunt = scanner.nextLine();
+
+        if (serviceBibliotheque.retournerLivre(idEmprunt)) {
             System.out.println("Livre retourné avec succès!");
         } else {
-            System.out.println("Impossible de retourner le livre. Vérifiez les IDs.");
+            System.out.println("Impossible de retourner le livre. Vérifiez l'ID de l'emprunt.");
         }
     }
 
@@ -215,21 +224,21 @@ public class ApplicationBibliotheque {
         System.out.println("\n=== Statistiques ===");
         System.out.println("Livres disponibles :");
         serviceBibliotheque.getLivresDisponibles().forEach(System.out::println);
-        
+
         System.out.println("\nLivres empruntés :");
         serviceBibliotheque.getLivresEmpruntes().forEach(System.out::println);
     }
 
     private static void supprimerLivre() {
         System.out.println("\n=== Supprimer un livre ===");
-        
+
         // Afficher la liste des livres
         System.out.println("\nListe des livres :");
         serviceBibliotheque.listerTousLesLivres();
-        
+
         System.out.print("\nID du livre à supprimer (ex: L001) : ");
         String idLivre = scanner.nextLine();
-        
+
         serviceBibliotheque.supprimerLivre(idLivre);
         System.out.println("Livre supprimé avec succès!");
     }
@@ -249,29 +258,29 @@ public class ApplicationBibliotheque {
 
     private static void noterLivre() {
         System.out.println("\n=== Noter un livre ===");
-        
+
         // Vérifier s'il y a des livres
         if (serviceBibliotheque.nombreLivres() == 0) {
             System.out.println("\nAucun livre dans la bibliothèque.");
             return;
         }
-        
+
         // Afficher la liste des livres
         System.out.println("\nListe des livres :");
         serviceBibliotheque.listerTousLesLivres();
-        
+
         System.out.print("\nID du livre (ex: L001) : ");
         String idLivre = scanner.nextLine();
-        
+
         boolean noteValide = false;
         double note = 0.0;
-        
+
         while (!noteValide) {
             System.out.print("Note (entre 0 et 5, par pas de 0.5) : ");
             try {
                 String input = scanner.nextLine();
                 note = Double.parseDouble(input);
-                
+
                 // Vérifie si la note est un multiple de 0.5 et comprise entre 0 et 5
                 if (note >= 0 && note <= 5 && Math.abs(note * 2 - Math.round(note * 2)) < 0.001) {
                     noteValide = true;
@@ -303,5 +312,28 @@ public class ApplicationBibliotheque {
             return;
         }
         serviceBibliotheque.listerTousLesLivres();
+    }
+
+    private static void afficherHistoriqueEmprunts() {
+        System.out.println("\n=== Historique des Emprunts ===");
+
+        List<Emprunt> historique = serviceBibliotheque.getHistoriqueEmprunts();
+        if (historique.isEmpty()) {
+            System.out.println("Aucun emprunt dans l'historique.");
+            return;
+        }
+
+        System.out.println("\nTous les emprunts :");
+        for (Emprunt emprunt : historique) {
+            String statut = emprunt.isEstRetourne() ?
+                    "Retourné le " + emprunt.getDateRetour() :
+                    "En cours";
+
+            System.out.println("ID Emprunt: " + emprunt.getId() +
+                    " | Livre: " + emprunt.getLivre().getTitre() +
+                    " | Emprunteur: " + emprunt.getUtilisateur().getNom() +
+                    " | Date d'emprunt: " + emprunt.getDateEmprunt() +
+                    " | Statut: " + statut);
+        }
     }
 }

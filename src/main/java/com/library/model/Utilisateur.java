@@ -61,10 +61,10 @@ public class Utilisateur {
      * @param livre Le livre à emprunter
      */
     public void emprunterLivre(Livre livre) {
-        if (livre.estDisponible()) {
+        if (livre.isDisponible()) {
             livresEmpruntes.add(livre);
             historiquePrets.add(livre);
-            livre.setEstDisponible(false);
+            livre.setDisponible(false);
         }
     }
 
@@ -74,7 +74,7 @@ public class Utilisateur {
      */
     public void rendreLivre(Livre livre) {
         livresEmpruntes.remove(livre);
-        livre.setEstDisponible(true);
+        livre.setDisponible(true);
     }
 
     @Override

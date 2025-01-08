@@ -6,6 +6,7 @@ package com.library.utils;
 public class GenerateurId {
     private static int dernierIdUtilisateur = 0;
     private static int dernierIdLivre = 0;
+    private static int dernierIdEmprunt = 0;
 
     /**
      * Génère un ID unique pour un utilisateur au format U001, U002, etc.
@@ -21,5 +22,13 @@ public class GenerateurId {
     public static synchronized String genererIdLivre() {
         dernierIdLivre++;
         return String.format("L%03d", dernierIdLivre);
+    }
+
+    /**
+     * Génère un ID unique pour un emprunt au format E001, E002, etc.
+     */
+    public static synchronized String genererIdEmprunt() {
+        dernierIdEmprunt++;
+        return String.format("E%03d", dernierIdEmprunt);
     }
 }

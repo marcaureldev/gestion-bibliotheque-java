@@ -11,7 +11,7 @@ public class Livre {
     private String auteur;
     private int anneePublication;
     private String genre;
-    private boolean estDisponible;
+    private boolean disponible;
     private double note;
     
     /**
@@ -28,7 +28,7 @@ public class Livre {
         this.auteur = auteur;
         this.anneePublication = anneePublication;
         this.genre = genre;
-        this.estDisponible = true;
+        this.disponible = true;
         this.note = 0.0;
     }
     
@@ -69,12 +69,12 @@ public class Livre {
         this.genre = genre;
     }
 
-    public boolean estDisponible() {
-        return estDisponible;
+    public boolean isDisponible() {
+        return disponible;
     }
 
-    public void setEstDisponible(boolean disponible) {
-        this.estDisponible = disponible;
+    public void setDisponible(boolean disponible) {
+        this.disponible = disponible;
     }
 
     public double getNote() {
@@ -96,7 +96,7 @@ public class Livre {
                 ", auteur='" + auteur + '\'' +
                 ", anneePublication=" + anneePublication +
                 ", genre='" + genre + '\'' +
-                ", estDisponible=" + estDisponible +
+                ", disponible=" + disponible +
                 ", note=" + note +
                 '}';
     }
