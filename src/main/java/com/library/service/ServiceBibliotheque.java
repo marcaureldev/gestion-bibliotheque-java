@@ -2,6 +2,7 @@ package com.library.service;
 
 import com.library.model.Livre;
 import com.library.model.Utilisateur;
+import com.library.utils.GenerateurId;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,6 +22,13 @@ public class ServiceBibliotheque {
     // Gestion des livres
     public void ajouterLivre(Livre livre) {
         livres.put(livre.getId(), livre);
+    }
+
+    public String ajouterLivre(String titre, String auteur, int anneePublication, String genre) {
+        String id = GenerateurId.genererIdLivre();
+        Livre livre = new Livre(id, titre, auteur, anneePublication, genre);
+        livres.put(id, livre);
+        return id;
     }
 
     public void supprimerLivre(String idLivre) {
@@ -145,5 +153,19 @@ public class ServiceBibliotheque {
         if (aucunEmprunt) {
             System.out.println("Aucun emprunt en cours.");
         }
+    }
+
+    // Méthodes utilitaires
+    public int nombreUtilisateurs() {
+        return utilisateurs.size();
+    }
+
+    public int nombreLivres() {
+        return livres.size();
+    }
+
+    public boolean existeEmpruntsEnCours() {
+        return utilisateurs.values().stream()
+                .anyMatch(u -> !u.getLivresEmpruntes().isEmpty());
     }
 }

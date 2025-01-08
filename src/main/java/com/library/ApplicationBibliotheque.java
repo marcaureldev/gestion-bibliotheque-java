@@ -5,6 +5,7 @@ import com.library.model.Utilisateur;
 import com.library.service.ServiceBibliotheque;
 import com.library.utils.GenerateurId;
 
+import java.time.Year;
 import java.util.List;
 import java.util.Scanner;
 
@@ -82,19 +83,34 @@ public class ApplicationBibliotheque {
 
     private static void ajouterLivre() {
         System.out.println("\n=== Ajouter un livre ===");
+        
         System.out.print("Titre : ");
         String titre = scanner.nextLine();
         System.out.print("Auteur : ");
         String auteur = scanner.nextLine();
-        System.out.print("Année de publication : ");
-        int annee = scanner.nextInt();
-        scanner.nextLine(); // Consommer la nouvelle ligne
+        
+        int anneePublication = 0;
+        boolean anneeValide = false;
+        int anneeActuelle = Year.now().getValue();
+        
+        while (!anneeValide) {
+            System.out.print("Année de publication : ");
+            try {
+                anneePublication = Integer.parseInt(scanner.nextLine());
+                if (anneePublication <= anneeActuelle) {
+                    anneeValide = true;
+                } else {
+                    System.out.println("L'année de publication ne peut pas être supérieure à l'année en cours (" + anneeActuelle + ").");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Veuillez entrer une année valide.");
+            }
+        }
+        
         System.out.print("Genre : ");
         String genre = scanner.nextLine();
 
-        String id = GenerateurId.genererIdLivre();
-        Livre livre = new Livre(id, titre, auteur, annee, genre);
-        serviceBibliotheque.ajouterLivre(livre);
+        String id = serviceBibliotheque.ajouterLivre(titre, auteur, anneePublication, genre);
         System.out.println("Livre ajouté avec succès! ID: " + id);
     }
 
@@ -137,13 +153,26 @@ public class ApplicationBibliotheque {
     private static void emprunterLivre() {
         System.out.println("\n=== Emprunter un livre ===");
         
+        // Vérifier s'il y a des utilisateurs
+        if (serviceBibliotheque.nombreUtilisateurs() == 0) {
+            System.out.println("\nAucun utilisateur enregistré. Veuillez d'abord ajouter un utilisateur.");
+            return;
+        }
+        
+        // Vérifier s'il y a des livres disponibles
+        List<Livre> livresDisponibles = serviceBibliotheque.getLivresDisponibles();
+        if (livresDisponibles.isEmpty()) {
+            System.out.println("\nAucun livre disponible pour l'emprunt.");
+            return;
+        }
+        
         // Afficher la liste des utilisateurs
         System.out.println("\nListe des utilisateurs :");
         serviceBibliotheque.listerUtilisateurs();
         
         // Afficher la liste des livres disponibles
         System.out.println("\nLivres disponibles :");
-        serviceBibliotheque.getLivresDisponibles().forEach(System.out::println);
+        livresDisponibles.forEach(System.out::println);
         
         System.out.print("\nID de l'utilisateur (ex: U001) : ");
         String idUtilisateur = scanner.nextLine();
@@ -159,6 +188,12 @@ public class ApplicationBibliotheque {
 
     private static void rendreLivre() {
         System.out.println("\n=== Retourner un livre ===");
+        
+        // Vérifier s'il y a des emprunts en cours
+        if (!serviceBibliotheque.existeEmpruntsEnCours()) {
+            System.out.println("\nAucun emprunt en cours.");
+            return;
+        }
         
         // Afficher la liste des utilisateurs et leurs livres empruntés
         System.out.println("\nLivres actuellement empruntés :");
@@ -215,6 +250,12 @@ public class ApplicationBibliotheque {
     private static void noterLivre() {
         System.out.println("\n=== Noter un livre ===");
         
+        // Vérifier s'il y a des livres
+        if (serviceBibliotheque.nombreLivres() == 0) {
+            System.out.println("\nAucun livre dans la bibliothèque.");
+            return;
+        }
+        
         // Afficher la liste des livres
         System.out.println("\nListe des livres :");
         serviceBibliotheque.listerTousLesLivres();
@@ -248,11 +289,19 @@ public class ApplicationBibliotheque {
 
     private static void listerUtilisateurs() {
         System.out.println("\n=== Liste des Utilisateurs ===");
+        if (serviceBibliotheque.nombreUtilisateurs() == 0) {
+            System.out.println("Aucun utilisateur enregistré.");
+            return;
+        }
         serviceBibliotheque.listerUtilisateurs();
     }
 
     private static void listerLivres() {
         System.out.println("\n=== Liste des Livres ===");
+        if (serviceBibliotheque.nombreLivres() == 0) {
+            System.out.println("Aucun livre dans la bibliothèque.");
+            return;
+        }
         serviceBibliotheque.listerTousLesLivres();
     }
 }
