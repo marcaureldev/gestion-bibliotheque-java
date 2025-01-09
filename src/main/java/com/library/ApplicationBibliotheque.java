@@ -4,6 +4,7 @@ import com.library.model.Livre;
 import com.library.model.Utilisateur;
 import com.library.model.Emprunt;
 import com.library.service.ServiceBibliotheque;
+import com.library.service.ClassementService;
 import com.library.utils.GenerateurId;
 
 import java.time.Year;
@@ -12,10 +13,12 @@ import java.util.Scanner;
 
 public class ApplicationBibliotheque {
     private static ServiceBibliotheque serviceBibliotheque;
+    private static ClassementService classementService;
     private static Scanner scanner;
 
     public static void main(String[] args) {
         serviceBibliotheque = new ServiceBibliotheque();
+        classementService = new ClassementService(serviceBibliotheque);
         scanner = new Scanner(System.in);
 
         while (true) {
@@ -51,7 +54,7 @@ public class ApplicationBibliotheque {
                     listerUtilisateurs();
                     break;
                 case "10":
-                    listerLivres();
+                    afficherTop10Livres();
                     break;
                 case "11":
                     afficherHistoriqueEmprunts();
@@ -77,7 +80,7 @@ public class ApplicationBibliotheque {
         System.out.println("7. Ajouter un utilisateur");
         System.out.println("8. Noter un livre");
         System.out.println("9. Lister les utilisateurs");
-        System.out.println("10. Lister tous les livres");
+        System.out.println("10. Top 10 des livres les plus empruntés");
         System.out.println("11. Afficher l'historique des emprunts");
         System.out.println("0. Quitter");
         System.out.print("Choix : ");
@@ -112,8 +115,10 @@ public class ApplicationBibliotheque {
         System.out.print("Genre : ");
         String genre = scanner.nextLine();
 
-        String id = serviceBibliotheque.ajouterLivre(titre, auteur, anneePublication, genre);
-        System.out.println("Livre ajouté avec succès! ID: " + id);
+        Livre nouveauLivre = new Livre(GenerateurId.genererIdLivre(), titre, auteur, anneePublication, genre);
+        serviceBibliotheque.ajouterLivre(nouveauLivre);
+        classementService.ajouterLivre(nouveauLivre);  // Ajouter le livre au service de classement
+        System.out.println("Livre ajouté avec succès !");
     }
 
     private static void rechercherLivres() {
@@ -237,6 +242,7 @@ public class ApplicationBibliotheque {
         String idLivre = scanner.nextLine();
 
         serviceBibliotheque.supprimerLivre(idLivre);
+        classementService.supprimerLivre(idLivre); // Supprimer le livre du service de classement
         System.out.println("Livre supprimé avec succès!");
     }
 
@@ -331,6 +337,24 @@ public class ApplicationBibliotheque {
                     " | Emprunteur: " + emprunt.getUtilisateur().getNom() +
                     " | Date d'emprunt: " + emprunt.getDateEmprunt() +
                     " | Statut: " + statut);
+        }
+    }
+
+    private static void afficherTop10Livres() {
+        List<Livre> top10 = classementService.getTop10LivresEmpruntes();
+        if (top10.isEmpty()) {
+            System.out.println("Aucun livre n'a encore été emprunté.");
+            return;
+        }
+
+        System.out.println("\n=== Top 10 des Livres les Plus Empruntés ===");
+        for (int i = 0; i < top10.size(); i++) {
+            Livre livre = top10.get(i);
+            System.out.printf("%d. %s par %s - %d emprunts%n",
+                    i + 1,
+                    livre.getTitre(),
+                    livre.getAuteur(),
+                    livre.getNombreEmprunts());
         }
     }
 }

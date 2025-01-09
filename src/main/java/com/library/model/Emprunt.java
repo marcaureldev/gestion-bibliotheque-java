@@ -16,6 +16,7 @@ public class Emprunt {
         this.utilisateur = utilisateur;
         this.dateEmprunt = dateEmprunt;
         this.estRetourne = false;
+        this.livre.incrementerEmprunts();  // Incrémente le compteur d'emprunts du livre
     }
 
     // Getters et Setters

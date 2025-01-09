@@ -2,7 +2,9 @@ package com.library.model;
 
 import java.time.LocalDate;
 
-
+/**
+ * Représente un livre dans la bibliothèque.
+ */
 public class Livre {
     private String id;
     private String titre;
@@ -11,8 +13,9 @@ public class Livre {
     private String genre;
     private boolean disponible;
     private double note;
+    private int nombreEmprunts;
     
-   
+
     public Livre(String id, String titre, String auteur, int anneePublication, String genre) {
         this.id = id;
         this.titre = titre;
@@ -21,6 +24,7 @@ public class Livre {
         this.genre = genre;
         this.disponible = true;
         this.note = 0.0;
+        this.nombreEmprunts = 0;
     }
     
     // Getters et Setters
@@ -79,6 +83,14 @@ public class Livre {
         }
     }
 
+    public int getNombreEmprunts() {
+        return nombreEmprunts;
+    }
+
+    public void incrementerEmprunts() {
+        this.nombreEmprunts++;
+    }
+
     @Override
     public String toString() {
         return "Livre{" +
@@ -89,6 +101,7 @@ public class Livre {
                 ", genre='" + genre + '\'' +
                 ", disponible=" + disponible +
                 ", note=" + note +
+                ", nombreEmprunts=" + nombreEmprunts +
                 '}';
     }
 }
