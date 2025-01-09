@@ -11,9 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Service principal de gestion de la bibliothèque
- */
+
 public class ServiceBibliotheque {
     private List<Livre> livres;
     private List<Utilisateur> utilisateurs;

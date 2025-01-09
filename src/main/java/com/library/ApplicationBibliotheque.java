@@ -10,9 +10,6 @@ import java.time.Year;
 import java.util.List;
 import java.util.Scanner;
 
-/**
- * Classe principale de l'application de gestion de bibliothèque
- */
 public class ApplicationBibliotheque {
     private static ServiceBibliotheque serviceBibliotheque;
     private static Scanner scanner;
@@ -127,7 +124,7 @@ public class ApplicationBibliotheque {
         System.out.print("Votre choix : ");
 
         int choix = scanner.nextInt();
-        scanner.nextLine(); // Consommer la nouvelle ligne
+        scanner.nextLine(); // Pour consommer la nouvelle ligne
 
         System.out.print("Entrez votre recherche : ");
         String recherche = scanner.nextLine();

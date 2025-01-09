@@ -3,9 +3,7 @@ package com.library.model;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Classe représentant un utilisateur de la bibliothèque
- */
+
 public class Utilisateur {
     private String id;
     private String nom;
@@ -13,12 +11,7 @@ public class Utilisateur {
     private List<Livre> livresEmpruntes;
     private List<Livre> historiquePrets;
 
-    /**
-     * Constructeur de la classe Utilisateur
-     * @param id Identifiant unique de l'utilisateur
-     * @param nom Nom de l'utilisateur
-     * @param email Email de l'utilisateur
-     */
+   
     public Utilisateur(String id, String nom, String email) {
         this.id = id;
         this.nom = nom;
@@ -56,10 +49,7 @@ public class Utilisateur {
         return historiquePrets;
     }
 
-    /**
-     * Emprunte un livre
-     * @param livre Le livre à emprunter
-     */
+    
     public void emprunterLivre(Livre livre) {
         if (livre.isDisponible()) {
             livresEmpruntes.add(livre);
@@ -68,10 +58,7 @@ public class Utilisateur {
         }
     }
 
-    /**
-     * Retourne un livre
-     * @param livre Le livre à retourner
-     */
+    
     public void rendreLivre(Livre livre) {
         livresEmpruntes.remove(livre);
         livre.setDisponible(true);

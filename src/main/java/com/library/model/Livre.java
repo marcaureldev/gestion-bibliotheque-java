@@ -2,9 +2,7 @@ package com.library.model;
 
 import java.time.LocalDate;
 
-/**
- * Classe représentant un livre dans la bibliothèque
- */
+
 public class Livre {
     private String id;
     private String titre;
@@ -14,14 +12,7 @@ public class Livre {
     private boolean disponible;
     private double note;
     
-    /**
-     * Constructeur de la classe Livre
-     * @param id Identifiant unique du livre
-     * @param titre Titre du livre
-     * @param auteur Auteur du livre
-     * @param anneePublication Année de publication
-     * @param genre Genre du livre
-     */
+   
     public Livre(String id, String titre, String auteur, int anneePublication, String genre) {
         this.id = id;
         this.titre = titre;
